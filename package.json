@@ -6,6 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "postinstall": "prisma generate",
+    "format": "prettier --write ./src/**/*.{ts,tsx,json}",
     "stripe": "stripe listen --forward-to localhost:3000/api/webhooks/stripe",
     "lint": "next lint",
     "start": "next start"

@@ -1,37 +1,37 @@
 [
-    {
-        "title":  "Personal",
-        "description": "Best for agents who work alone or have a single assistant.",
-        "price": 49,
-        "features": [
-            "1 additional user",
-            "Encrypted Data",
-            "Unlimited Contacts",
-            "Unlimited Appointments"
-        ]
-    },
-    {
-        "title":  "Small Team",
-        "description": "Best for small teams where admins can control access.",
-        "price": 99,
-        "features": [
-            "8 additional users",
-            "Encrypted Data",
-            "Unlimited Contacts",
-            "Unlimited Appointments"
-        ]
-    },
-    {
-        "title":  "Large Team",
-        "description": "Best for larger teams.",
-        "price": 399,
-        "features": [
-            "25 additional users",
-            "Custom Branding",
-            "Unlimited users",
-            "Encrypted Data",
-            "Unlimited Contacts",
-            "Unlimited Appointments"
-        ]
-    }
+  {
+    "title": "Personal",
+    "description": "Best for agents who work alone or have a single assistant.",
+    "price": 49,
+    "features": [
+      "1 additional user",
+      "Encrypted Data",
+      "Unlimited Contacts",
+      "Unlimited Appointments"
+    ]
+  },
+  {
+    "title": "Small Team",
+    "description": "Best for small teams where admins can control access.",
+    "price": 99,
+    "features": [
+      "8 additional users",
+      "Encrypted Data",
+      "Unlimited Contacts",
+      "Unlimited Appointments"
+    ]
+  },
+  {
+    "title": "Large Team",
+    "description": "Best for larger teams.",
+    "price": 399,
+    "features": [
+      "25 additional users",
+      "Custom Branding",
+      "Unlimited users",
+      "Encrypted Data",
+      "Unlimited Contacts",
+      "Unlimited Appointments"
+    ]
+  }
 ]
