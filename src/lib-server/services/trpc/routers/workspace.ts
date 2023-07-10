@@ -1,10 +1,12 @@
 import {
   createTRPCRouter,
   protectedProcedure,
-
 } from "@/lib-server/services/trpc/trpc";
+import { workspaceUserWrapper } from "@/lib-server/workspaceUserWrapper";
 import { clerkClient } from "@clerk/nextjs";
 import { TRPCError } from "@trpc/server";
+import {z} from 'zod'
+
 
 
 export const workspaceRouter = createTRPCRouter({
@@ -31,5 +33,14 @@ export const workspaceRouter = createTRPCRouter({
                 }
             }
         });
-    })
+    }),  
+    getOwner: protectedProcedure.input(z.object({
+        workspaceId: z.string()
+    })).query(async ({ ctx, input }) => await workspaceUserWrapper(ctx.auth, input.workspaceId, undefined, async ({ workspaceUser }) => {
+        return await ctx.prisma.workspace.findUnique({
+            where: {
+                id: input.workspaceId
+            }
+        })
+    }))
 })

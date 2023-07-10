@@ -1,8 +1,9 @@
 [
   {
-    "title": "Personal",
+    "title": "Agent",
     "description": "Best for agents who work alone or have a single assistant.",
     "price": 49,
+    "maxUsers": 2,
     "features": [
       "1 additional user",
       "Encrypted Data",
@@ -11,9 +12,10 @@
     ]
   },
   {
-    "title": "Small Team",
+    "title": "Team",
     "description": "Best for small teams where admins can control access.",
-    "price": 99,
+    "price": 250,
+    "maxUsers": 10,
     "features": [
       "8 additional users",
       "Encrypted Data",
@@ -23,8 +25,20 @@
   },
   {
     "title": "Large Team",
+    "description": "Best for small teams where admins can control access.",
+    "price": 1000,
+    "maxUsers": 40,
+    "features": [
+      "8 additional users",
+      "Encrypted Data",
+      "Unlimited Contacts",
+      "Unlimited Appointments"
+    ]
+  },
+  {
+    "title": "Brokerage",
     "description": "Best for larger teams.",
-    "price": 399,
+    "price": 4000,
     "features": [
       "25 additional users",
       "Custom Branding",

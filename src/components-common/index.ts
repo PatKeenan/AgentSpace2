@@ -1,4 +1,7 @@
 export * from "./Header";
 export * from "./HomeNav";
-export * from "./PricingCard";
+export * from "./Main";
+export * from "./Screen";
+
+export * from "./WorkspaceCard";
 export * from "./WorkspaceNav";

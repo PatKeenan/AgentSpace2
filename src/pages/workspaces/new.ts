@@ -1,1 +1,1 @@
-export {AddWorkspaceScreen as default} from "@/components-features/workspaces/AddWorkspaceScreen"
+export {AddWorkspaceScreen as default} from "@/components-features/AddWorkspaceScreen"
