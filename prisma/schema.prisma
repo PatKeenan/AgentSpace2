@@ -35,38 +35,24 @@ model Subscription {
 }
 
 model WorkspaceUser {
-    email       String
+    id          String              @id @default(uuid())
     workspace   Workspace           @relation(fields: [workspaceId], references: [id])
     workspaceId String
-    userId      String? // User might not be registered yet when added to a workspace by an owner
+    userId      String?
+    email       String? // Email is used to invite users to a workspace
     role        Role
     status      WorkspaceUserStatus
-
-    @@id([email, workspaceId])
-    @@unique([email, workspaceId])
 }
 
 model Workspace {
-    id               String           @id @default(uuid())
-    createdAt        DateTime         @default(now())
-    updatedAt        DateTime         @updatedAt
-    ownerId          String
-    subscription     Subscription?
-    users            WorkspaceUser[]
-    tasks            Task[]
-    securityPolicies SecurityPolicy[]
-}
-
-// Query the security policy for a given entity and check if the user has the required permissions for the given CRUD operation.
-// If no security policy is found for the given entity, the user has all permissions.
-model SecurityPolicy {
-    id              String    @id @default(uuid())
-    workspace       Workspace @relation(fields: [workspaceId], references: [id])
-    workspaceId     String
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
-    entity          String // workspace, task etc
-    crudPermissions Json // { create: [admin, editor], read: [] - empty array means all, update: [admin, editor], delete: [admin, editor] }
+    id           String          @id @default(uuid())
+    createdAt    DateTime        @default(now())
+    updatedAt    DateTime        @updatedAt
+    ownerId      String
+    name         String
+    subscription Subscription?
+    users        WorkspaceUser[]
+    tasks        Task[]
 }
 
 model Task {
@@ -90,6 +76,5 @@ enum Role {
     OWNER
     ADMIN
     EDITOR
-    MEMBER
-    ANONYMOUS
+    VIEWER
 }

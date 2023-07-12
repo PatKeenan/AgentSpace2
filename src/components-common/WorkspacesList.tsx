@@ -1,15 +1,38 @@
 import React from "react";
-import { useOrganizationList } from "@clerk/nextjs";
 import Link from "next/link";
 
 import { Card, CardContent } from "./ui/Card";
-
 import { PlusIcon } from "lucide-react";
-import { WorkspaceCard, WorkspaceCardContainer } from "./WorkspaceCard";
+import {
+  WorkspaceCard,
+  WorkspaceCardContainer,
+} from "@/components-common/WorkspaceCard";
+import { trpcApi } from "@/lib-client/services/trpc-api";
 
-export const WorkspacesList = () => {
-  const { organizationList } = useOrganizationList();
-  return (
+type WorkspacesListProps = {
+  handleNoWorkspaces?: () => void;
+  handleHasWorkspaces?: () => void;
+};
+export const WorkspacesList: React.FC<WorkspacesListProps> = ({
+  handleNoWorkspaces,
+  handleHasWorkspaces,
+}) => {
+  const [hasWorkspaces, setHasWorkspaces] = React.useState(false);
+
+  const { data, isLoading } = trpcApi.workspace.list.useQuery(undefined, {
+    onSuccess: (d) => {
+      if (d?.length > 0) {
+        setHasWorkspaces(true);
+        handleHasWorkspaces?.();
+      } else {
+        handleNoWorkspaces?.();
+      }
+    },
+  });
+
+  return !data && isLoading ? (
+    <></>
+  ) : hasWorkspaces ? (
     <div className="flex w-full flex-col-reverse gap-8 sm:flex-row sm:flex-wrap">
       <WorkspaceCardContainer>
         <Link href={`/workspaces/new`}>
@@ -29,20 +52,19 @@ export const WorkspacesList = () => {
         </Link>
       </WorkspaceCardContainer>
 
-      {organizationList?.map((workspace, idx) => (
-        <WorkspaceCardContainer key={workspace.organization.id}>
-          <Link href={`/workspaces/${workspace.organization.id}`}>
+      {data?.map((workspace, idx) => (
+        <WorkspaceCardContainer key={workspace.id}>
+          <Link href={`/workspaces/${workspace.id}`}>
             <WorkspaceCard
-              title={workspace.organization.name}
+              title={workspace.name}
               plan="team"
-              updatedAt={new Date(
-                workspace.organization.updatedAt
-              ).toLocaleDateString()}
-              memberCount={workspace.organization.membersCount}
+              updatedAt={new Date(workspace.updatedAt).toLocaleDateString()}
             />
           </Link>
         </WorkspaceCardContainer>
       ))}
     </div>
+  ) : (
+    <></>
   );
 };

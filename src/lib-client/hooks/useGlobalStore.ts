@@ -11,9 +11,6 @@ export type WorkspaceAuthSlice = {
 };
 
 export const createWorkspaceAuthSlice: StateCreator<
-  WorkspaceAuthSlice,
-  [],
-  [],
   WorkspaceAuthSlice
 > = (set, get) => ({
   user: undefined,
@@ -23,6 +20,27 @@ export const createWorkspaceAuthSlice: StateCreator<
   setState: (state) => set((st) => ({ ...st, ...state })),
 });
 
-export const useGlobalStore = create<WorkspaceAuthSlice>()((...a) => ({
+
+export type ModalContentOptions =  "Not signed in" | "Not authorized" | "Not found" | "Error" | "Success" | "Loading" | "None" 
+
+export type ModalSlice = {
+    open: boolean
+    setOpen: (open: boolean) => void
+    modalContent: ModalContentOptions
+    setModalContent: (content: ModalContentOptions) => void
+    setModalState: (state: Partial<ModalSlice>) => void
+}
+
+export const createModalSlice: StateCreator<ModalSlice> = (set, get) => ({
+    open: false,
+    setOpen: (open) => set({ open }),
+    modalContent: "None",
+    setModalContent: (modalContent) => set({ modalContent }),
+    setModalState: (state) => set((st) => ({ ...st, ...state })),
+})
+
+
+export const useGlobalStore = create<WorkspaceAuthSlice & ModalSlice>()((...a) => ({
     ...createWorkspaceAuthSlice(...a),
+    ...createModalSlice(...a)
 }))

@@ -1,10 +1,8 @@
 import { SignedInAuthObject } from "@clerk/nextjs/dist/types/server";
 import type { PrismaClient } from "@prisma/client";
-
-import { authService } from "./authService";
 import { TRPCError } from "@trpc/server";
 import { prisma } from "../db";
-
+import { clerkClient } from "@clerk/nextjs";
 
 class WorkspaceUserDbService {
     db: PrismaClient
@@ -12,22 +10,48 @@ class WorkspaceUserDbService {
         this.db = prisma 
     }
     async getWorkspacePermissions(auth: SignedInAuthObject,workspaceId: string){
-        const userEmail = await authService.getUserPrimaryEmail(auth)
-        if(!userEmail){
-            throw new TRPCError({code: 'UNAUTHORIZED'})
-        }
-
-        const workspaceUser = await this.db.workspaceUser.findUnique({
-            where: {
-                email_workspaceId:{
-                    email: userEmail,
-                    workspaceId: workspaceId
+        const userPrimaryEmail = await clerkClient.users.getUser(auth.userId).then((user) => user.emailAddresses.find((email) => email.id === user.primaryEmailAddressId)?.emailAddress)
+        const workspaceUser = await this.db.workspaceUser.findFirst({
+            where: {    
+                'OR': [{
+                    workspaceId: workspaceId,
+                    userId: auth.userId
+                },
+                {
+                    workspaceId: workspaceId,
+                    email: userPrimaryEmail
                 }
+            ]
             }
         })
 
+        if(workspaceUser && !workspaceUser.email && userPrimaryEmail){
+            await this.db.workspaceUser.update({
+                where: {
+                   id: workspaceUser.id
+                },
+                data: {
+                    email: userPrimaryEmail
+                }
+            })
+        }
+
         if(!workspaceUser || ['BANNED', "REMOVED"].includes(workspaceUser.status )){
             throw new TRPCError({code: 'UNAUTHORIZED'})
+        }
+
+        if(!workspaceUser.userId){
+            await this.db.workspaceUser.update({
+                where: {
+                    workspaceId_userId:{
+                        workspaceId: workspaceId,
+                        userId: auth.userId
+                    }
+                },
+                data: {
+                    userId: auth.userId
+                }
+            })
         }
         return workspaceUser
     }

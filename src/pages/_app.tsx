@@ -3,6 +3,7 @@ import { trpcApi } from "@/lib-client/services/trpc-api";
 import { ClerkProvider } from "@clerk/nextjs";
 import "@/styles/globals.css";
 import { env } from "@/env.mjs";
+import { Toaster } from "@/components-common/ui/Toaster";
 
 const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
   return (
@@ -11,6 +12,7 @@ const MyApp: AppType = ({ Component, pageProps: { ...pageProps } }) => {
       {...pageProps}
     >
       <Component {...pageProps} />
+      <Toaster />
     </ClerkProvider>
   );
 };

@@ -4,17 +4,39 @@ import { Button } from "@/components-common/ui/Button";
 import { RoleHandler } from "@/components-common/RoleHandler";
 import { trpcApi } from "@/lib-client/services/trpc-api";
 import { useWorkspaceAuthStore } from "@/lib-client/hooks/useWorkspaceAuth";
+import { useToast } from "@/lib-client/hooks/useToast";
+import { ToastAction } from "@/components-common/ui/Toast";
+import { useModal } from "@/lib-client/hooks/useModal";
 
 export const DashboardScreen = () => {
   const { workspaceId } = useWorkspaceAuthStore();
-
-  const { data, isLoading } = trpcApi.workspace.getOwner.useQuery(
+  const { setModalState } = useModal();
+  const { toast } = useToast();
+  const { data, isLoading, refetch } = trpcApi.workspace.dashboard.useQuery(
     {
       workspaceId: workspaceId as string,
     },
     {
       enabled: !!workspaceId,
       retry: false,
+      onError: (error) => {
+        if (error.data?.code == "UNAUTHORIZED") {
+          setModalState({
+            open: true,
+            modalContent: "Not authorized",
+          });
+        } else {
+          toast({
+            title: "Uh oh! Something went wrong.",
+            description: "There was a problem with your request.",
+            action: (
+              <ToastAction altText="Try again" onClick={() => refetch()}>
+                Try again
+              </ToastAction>
+            ),
+          });
+        }
+      },
     }
   );
 
@@ -23,7 +45,7 @@ export const DashboardScreen = () => {
       <div>Dashboard Screen!</div>
       <div className="flex space-x-4">
         <RoleHandler
-          requires={["ADMIN"]}
+          requires={["ADMIN", "OWNER"]}
           fallback={<div>You cant see this</div>}
         >
           <Button>Admin Button!</Button>

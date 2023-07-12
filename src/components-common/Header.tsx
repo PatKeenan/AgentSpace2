@@ -3,7 +3,6 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
-  UserProfile,
 } from "@clerk/nextjs";
 
 export const Header = ({
@@ -12,7 +11,7 @@ export const Header = ({
   location: "homeScreen" | "workspaceScreen";
 }) => {
   return (
-    <header className="relative border-b py-3">
+    <header className="relative h-16 border-b py-3">
       <div className="absolute inset-y-0 ml-3 flex items-center">
         <div>Logo</div>
       </div>
