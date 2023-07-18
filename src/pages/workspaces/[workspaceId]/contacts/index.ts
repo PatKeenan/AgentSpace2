@@ -1,0 +1,1 @@
+export {ContactScreen as default} from "@/components-features/ContactScreen"

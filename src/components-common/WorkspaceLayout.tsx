@@ -9,15 +9,18 @@ import { RootModal } from "@/components-common/modals/RootModal";
 import Link from "next/link";
 import { LockIcon } from "lucide-react";
 import { Button } from "./ui/Button";
+import { type NavItemOptions, WorkspaceSidebar } from "./WorkspaceSidebar";
 
 type WorkspaceLayoutProps = {
   children: React.ReactNode;
+  activeNavItem?: NavItemOptions;
 };
 
 export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
   children,
+  activeNavItem,
 }) => {
-  const { setState } = useWorkspaceAuthStore();
+  const { setState, user } = useWorkspaceAuthStore();
 
   const router = useRouter();
   const workspaceId = router.query.workspaceId;
@@ -34,7 +37,8 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
           }
           return true;
         },
-        enabled: typeof workspaceId === "string",
+        refetchOnMount: user?.role !== "OWNER",
+        enabled: typeof workspaceId === "string" && user?.role !== "OWNER",
         onSuccess: (data) => {
           if (data.workspaceId && data.userId) {
             setState({ workspaceId: data.workspaceId, user: data });
@@ -50,7 +54,7 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
         workspaceId: undefined,
       });
     };
-  }, []);
+  }, [setState]);
 
   return typeof workspaceId !== "string" || (!data && isLoading) ? (
     <div className="grid h-screen w-screen place-items-center">
@@ -59,10 +63,13 @@ export const WorkspaceLayout: React.FC<WorkspaceLayoutProps> = ({
   ) : data && !isLoading ? (
     <Screen>
       <Header location="workspaceScreen" />
-      <Main fullWidth>
-        <RootModal />
-        {children}
-      </Main>
+      <div className="flex h-full min-h-full min-w-full flex-auto">
+        <WorkspaceSidebar activeItem={activeNavItem} />
+        <Main fullWidth className="ml-60">
+          <RootModal />
+          {children}
+        </Main>
+      </div>
     </Screen>
   ) : (
     <div className="grid h-screen w-screen place-items-center text-center">

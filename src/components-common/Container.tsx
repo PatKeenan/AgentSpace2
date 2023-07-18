@@ -25,7 +25,7 @@ export const Container: React.FC<ContainerProps> = ({
   return (
     <Tag
       className={cn(
-        width === "site" ? "mx-auto max-w-6xl" : "w-full",
+        width === "site" ? "mx-auto w-full max-w-6xl" : "w-full",
         pt,
         pb,
         pl,

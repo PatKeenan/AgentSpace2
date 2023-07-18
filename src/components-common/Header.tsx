@@ -4,6 +4,9 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
 
 export const Header = ({
   location,
@@ -11,12 +14,12 @@ export const Header = ({
   location: "homeScreen" | "workspaceScreen";
 }) => {
   return (
-    <header className="relative h-16 border-b py-3">
+    <header className="fixed left-0 right-0 top-0 z-50 h-16 border-b bg-white py-3">
       <div className="absolute inset-y-0 ml-3 flex items-center">
         <div>Logo</div>
       </div>
       <div className="container flex justify-end">
-        <nav className="flex gap-x-3">
+        <nav className="flex items-center gap-x-3">
           {location == "workspaceScreen" && <WorkspaceScreenNav />}
           <SignedIn>
             <UserButton />
@@ -31,11 +34,15 @@ export const Header = ({
 };
 
 const WorkspaceScreenNav = () => {
+  const router = useRouter();
   return (
-    <>
-      <div>Home</div>
-      <div>Workspaces</div>
-      <div>Profile</div>
-    </>
+    <React.Fragment>
+      <Link
+        href={`/workspaces/${router.query.workspaceId as string}/settings`}
+        className="text-muted-foreground"
+      >
+        Settings
+      </Link>
+    </React.Fragment>
   );
 };
