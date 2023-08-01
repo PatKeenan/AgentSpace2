@@ -28,8 +28,6 @@ export async function workspaceUserWrapper<T extends (...args: any) => any>(
     workspaceId
   );
 
-
-
   // Check if the user has the required role
   if (requires && !requires.includes(workspaceUser.role)) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
