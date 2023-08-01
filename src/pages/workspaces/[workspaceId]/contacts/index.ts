@@ -1,1 +1,1 @@
-export {ContactScreen as default} from "@/components-features/ContactScreen"
+export {ContactsScreen as default} from "@/components-features/ContactsScreen"

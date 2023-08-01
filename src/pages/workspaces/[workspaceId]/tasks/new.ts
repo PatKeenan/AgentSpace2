@@ -1,0 +1,1 @@
+export {TaskDetailsScreen as default} from "@/components-features/TaskDetailsScreen"

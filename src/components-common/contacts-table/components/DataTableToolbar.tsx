@@ -1,4 +1,4 @@
-import { Cross2Icon, PlusIcon } from "@radix-ui/react-icons";
+import { Cross2Icon } from "@radix-ui/react-icons";
 import { type Table } from "@tanstack/react-table";
 
 import { DataTableViewOptions } from "./DataTableViewOptions";
@@ -8,12 +8,14 @@ import { DataTableFacetedFilter } from "./DataTableFacetedFilter";
 import { Input } from "@/components-common/ui/Input";
 import { Button } from "@/components-common/ui/Button";
 
-interface DataTableToolbarProps<TData> {
+type DataTableToolbarProps<TData> = {
   table: Table<TData>;
-}
+  actions?: React.ReactNode;
+};
 
 export function DataTableToolbar<TData>({
   table,
+  actions,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -55,10 +57,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex space-x-2">
         <DataTableViewOptions table={table} />
-        <Button size="sm">
-          <PlusIcon className="mr-1" />
-          Add New
-        </Button>
+        {actions}
       </div>
     </div>
   );

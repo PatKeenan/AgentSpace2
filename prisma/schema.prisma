@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -35,34 +34,243 @@ model Subscription {
 }
 
 model WorkspaceUser {
-    id          String              @id @default(uuid())
-    workspace   Workspace           @relation(fields: [workspaceId], references: [id])
-    workspaceId String
-    userId      String?
-    email       String? // Email is used to invite users to a workspace
-    role        Role
-    status      WorkspaceUserStatus
+    id             String              @id @default(uuid())
+    workspace      Workspace           @relation(fields: [workspaceId], references: [id])
+    workspaceId    String
+    userId         String?
+    email          String? // Email is used to invite users to a workspace
+    role           Role
+    status         WorkspaceUserStatus
+    tasks          Task[]
+    label          ContactLabel[]
+    contacts       Contact[]
+    contactSources ContactSource[]
+    checkLists     CheckList[]
+    campaigns      Campaign[]
+    expenses       Expense[]
 }
 
 model Workspace {
-    id           String          @id @default(uuid())
-    createdAt    DateTime        @default(now())
-    updatedAt    DateTime        @updatedAt
-    ownerId      String
+    id             String          @id @default(uuid())
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    ownerId        String
+    name           String
+    subscription   Subscription?
+    users          WorkspaceUser[]
+    contacts       Contact[]
+    contactLabels  ContactLabel[]
+    contactSources ContactSource[]
+    tasks          Task[]
+    checkLists     CheckList[]
+    campaign       Campaign[]
+    expenses       Expense[]
+}
+
+model Campaign {
+    id                                String        @id @default(uuid())
+    createdAt                         DateTime      @default(now())
+    createdBy                         WorkspaceUser @relation(fields: [createdById], references: [id])
+    createdById                       String
+    updatedAt                         DateTime      @updatedAt
+    workspace                         Workspace     @relation(fields: [workspaceId], references: [id])
+    workspaceId                       String
+    name                              String
+    description                       String?
+    type                              String // email, sms, voice, social, direct mail, gift delivery, etc
+    status                            String // active, paused, completed, canceled
+    successRate                       Float? // The success rate of the campaign
+    startDate                         DateTime?
+    endDate                           DateTime?
+    contacts                          Contact[]
+    checkList                         CheckList[]
+    tasks                             Task[]
+    reoccurring                       Boolean? // If true, the campaign will reoccur based on the reoccurringInterval
+    reoccurringInterval               String? // daily, weekly, monthly, yearly
+    reoccurringIntervalCount          Int? // The number of times the campaign will reoccur
+    reoccurringIntervalEndsAt         DateTime? // The date the reoccurring campaign will end
+    reoccurringIntervalEndsAfter      Int? // The number of times the reoccurring campaign will reoccur
+    reoccurringIntervalEndsType       String? // never, onDate, afterCount
+    reoccurringIntervalEndsOnDate     DateTime? // The date the reoccurring campaign will end
+    reoccurringIntervalEndsAfterCount Int? // The number of times the reoccurring campaign will reoccur
+    reoccurringIntervalEndsAfterType  String? // contacts, days
+    unsubscribeLink                   String? // The link to unsubscribe from the campaign
+    unsubscribeMessage                String? // The message to display when a contact unsubscribes from the campaign
+    unsubscribeRedirectUrl            String? // The url to redirect to after a contact unsubscribes from the campaign
+    unsubscribeRedirectMessage        String? // The message to display when a contact unsubscribes from the campaign
+    expenses                          Expense[]
+    budget                            Float? // The budget for the campaign
+}
+
+model Expense {
+    id          String        @id @default(uuid())
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    campaign    Campaign[] // The campaign the expense is associated with if any
+    workspace   Workspace     @relation(fields: [workspaceId], references: [id])
+    workspaceId String
+    createdBy   WorkspaceUser @relation(fields: [createdById], references: [id])
+    createdById String
+    price       Float
+    hours       Float?
+    mileage     Float? // The number of miles driven if expense is for mileage
+    paidAt      DateTime?
+    paidBy      String? // The user that paid the expense
+    paidAmount  Float?
+    paidMethod  String? // cash, check, credit, debit, bank transfer, other
+    paidNote    String?
+    name        String
+    description String?
+    type        String? // marketing, advertising, gas, brokerage dues, etc other
+    status      String? // paid, unpaid, partial
+    dueAt       DateTime?
+    receipt     String? // The url to the receipt
+}
+
+model Contact {
+    id           String               @id @default(uuid())
+    createdAt    DateTime             @default(now())
+    createdBy    WorkspaceUser        @relation(fields: [createdById], references: [id])
+    createdById  String
+    updatedAt    DateTime             @updatedAt
+    workspace    Workspace            @relation(fields: [workspaceId], references: [id])
+    workspaceId  String
     name         String
-    subscription Subscription?
-    users        WorkspaceUser[]
-    tasks        Task[]
+    notes        String?
+    emails       ContactEmail[]
+    phoneNumbers ContactPhoneNumber[]
+    companies    ContactCompany[]
+    labels       ContactLabel[]
+    source       ContactSource?       @relation(fields: [sourceId], references: [id])
+    sourceId     String?
+    leadStatus   String? // new, contacted, qualified, unqualified, converted, closed
+    leadScore    Int? // 0 - 100
+    leadOwnerId  String? // The user that owns the lead
+    touchHistory Json? // An array of touch history objects
+    campaigns    Campaign[]
+}
+
+model ContactSource {
+    id                 String        @id @default(uuid())
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
+    workspace          Workspace     @relation(fields: [workspaceId], references: [id])
+    workspaceId        String
+    createdBy          WorkspaceUser @relation(fields: [createdById], references: [id])
+    createdById        String
+    name               String? // Zillow, Facebook, etc
+    referringContactId String? // The contact that referred this contact if any
+    contacts           Contact[]
+}
+
+model ContactCompany {
+    id                  String         @id @default(uuid())
+    createdAt           DateTime       @default(now())
+    updatedAt           DateTime       @updatedAt
+    name                String
+    contact             Contact        @relation(fields: [contactId], references: [id])
+    contactId           String
+    phone               String?
+    email               String?
+    address             String?
+    city                String?
+    state               String?
+    zip                 String?
+    country             String?
+    website             String?
+    social              Json?
+    title               String? // Job title
+    notes               String?
+    services            String? // Services provided by the company
+    isPrimary           Boolean?
+    labels              ContactLabel[]
+    connectedContactIds String[] // Used to connect contacts to a company
+}
+
+model ContactEmail {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    contact   Contact  @relation(fields: [contactId], references: [id])
+    contactId String
+    email     String
+    type      String // work, personal
+    isPrimary Boolean
+}
+
+model ContactPhoneNumber {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    contact   Contact  @relation(fields: [contactId], references: [id])
+    contactId String
+    phone     String
+    type      String // work, personal
+    isPrimary Boolean
+}
+
+model ContactLabel {
+    id               String           @id @default(uuid())
+    createdAt        DateTime         @default(now())
+    updatedAt        DateTime         @updatedAt
+    workspace        Workspace        @relation(fields: [workspaceId], references: [id])
+    creadtedBy       WorkspaceUser    @relation(fields: [createdById], references: [id])
+    createdById      String
+    workspaceId      String
+    contacts         Contact[]
+    contactCompanies ContactCompany[]
 }
 
 model Task {
+    id          String        @id @default(uuid())
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+    workspace   Workspace     @relation(fields: [workspaceId], references: [id])
+    workspaceId String
+    creadtedBy  WorkspaceUser @relation(fields: [createdById], references: [id])
+    createdById String
+    status      String // open, closed
+    priority    String // low, medium, high
+    title       String
+    description String
+    dueDate     DateTime?
+    assigneeId  String // The user assigned to the task - workspaceUserId
+    campaign    Campaign?     @relation(fields: [campaignId], references: [id])
+    campaignId  String?
+}
+
+model CheckListItem {
     id          String    @id @default(uuid())
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
-    workspace   Workspace @relation(fields: [workspaceId], references: [id])
+    checkList   CheckList @relation(fields: [checkListId], references: [id])
+    checkListId String
+    dueDate     DateTime?
+    doneAt      DateTime?
+    priority    String? // low, medium, high
+    progress    Int?
+    blocked     Boolean
+    note        String?
+    text        String
+    isDone      Boolean
+    assigneeId  String? // The user assigned to the task - workspaceUserId
+    order       Int?
+}
+
+model CheckList {
+    id          String          @id @default(uuid())
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+    createdBy   WorkspaceUser   @relation(fields: [createdById], references: [id])
+    createdById String
+    workspace   Workspace       @relation(fields: [workspaceId], references: [id])
     workspaceId String
-    status      String // open, closed
-    description String
+    status      String // open, closed, archived, deleted, none
+    title       String
+    description String?
+    items       CheckListItem[]
+    Campaign    Campaign?       @relation(fields: [campaignId], references: [id])
+    campaignId  String?
 }
 
 enum WorkspaceUserStatus {

@@ -12,7 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  RowSelectionState,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 
 import {
@@ -26,26 +26,18 @@ import {
 
 import { DataTablePagination } from "./DataTablePagination";
 import { DataTableToolbar } from "./DataTableToolbar";
+import { useRouter } from "next/router";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  actions?: React.ReactNode;
 }
-type DataTableState = {
-  rowSelection: RowSelectionState | undefined;
-  columnVisibility: VisibilityState | undefined;
-  columnFilters: ColumnFiltersState | undefined;
-  sorting: SortingState;
-};
-
-const dataTableReducer = (
-  state: DataTableState,
-  action: Partial<DataTableState>
-) => ({ ...state, action });
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  actions,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -53,15 +45,8 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  /* const [state, dispatch] = React.useReducer(dataTableReducer, {
-    rowSelection: {},
-   columnVisibility: {},
-   columnFilters: [],
-   sorting: [],
-  })
- */
+
   const table = useReactTable({
     data,
     columns,
@@ -71,6 +56,7 @@ export function DataTable<TData, TValue>({
       rowSelection,
       columnFilters,
     },
+
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -85,11 +71,11 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4">
-      <DataTableToolbar table={table} />
+    <div className="space-y-4 pt-3">
+      <DataTableToolbar table={table} actions={actions} />
       <div className="rounded-md border">
         {table && (
-          <Table>
+          <Table className="bg-white">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>

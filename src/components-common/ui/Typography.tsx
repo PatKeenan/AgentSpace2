@@ -30,7 +30,7 @@ const themeOptions = {
   pageTitle: cn(
     typographyColors.foreground,
     typographyWeights.semiBold,
-    typographySizes.h3,
+    typographySizes.h2,
     "leading-none tracking-tight"
   ),
 };
